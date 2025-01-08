@@ -1,0 +1,39 @@
+.aaq-wrapper{
+    max-width: 600px;
+    margin: auto;
+    margin-bottom: 30px;
+}
+
+.aaq-wrapper label{
+    display: block;
+    width: 100%;
+}
+
+.aaq-wrapper .aaq-progress-bar{
+    background: #ddd;
+    border-radius: 999px;
+    height: 10px;
+    width: calc(100% - 50px);
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.aaq-wrapper .aaq-progress-bar .aaq-progress{
+    background: var(--color-main);
+    border-radius: 999px;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0px;
+    transition: all 500ms;
+}
+.aaq-wrapper .aaq-progress-bar span{
+    position: absolute;
+    top: 0;
+    right: -50px;
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: bold;
+}
