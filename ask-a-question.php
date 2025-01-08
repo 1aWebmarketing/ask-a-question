@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Ask a Question
  * Description: Plugin um eine Frage an die Leser zu stellen. Wird mittels Shortcode eingebunden
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Michael Homeister
  * Author URI: https://budigital.de/
  * Update URI:    https://budigital.de
@@ -12,10 +12,12 @@
 
 // Theme Updater
 require 'includes/plugin-update-checker/plugin-update-checker.php';
-$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+$myUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://budigital.de/updates/?action=get_metadata&slug=ask-a-question',
 	__FILE__,
+	'monday-api'
 );
+
 
 function sc_question($atts, $content = null){
     $atts = shortcode_atts( [
@@ -61,8 +63,6 @@ function sc_question($atts, $content = null){
 			<button class="reset-aaq-<?php echo $question_id ?>" data-question="<?php echo $question_id ?>">Umfrage zurücksetzen</button>
 			<script>
 				jQuery(".reset-aaq-<?php echo $question_id ?>").click(function(){
-					console.log("resetting")
-
 					jQuery.ajax({
 				        type: "POST",
 				        url: wp_ajax_url,
@@ -82,17 +82,12 @@ function sc_question($atts, $content = null){
 		<?php } ?>
 
         <script>
-
             var wp_ajax_url = '<?php echo admin_url( 'admin-ajax.php' ) ?>'
 
             jQuery(document).ready(function(){
-
                 jQuery("#<?php echo $question_id ?> input").change(function(){
-
                     var n_answer = jQuery(this).data('answer')
                     var answer = jQuery(this).data('answer-text')
-
-                    // console.log( "Increment " +  n_answer)
 
                     aaqSendAnswer('<?php echo $question_id; ?>', n_answer, <?php echo count($answers) ?>, <?php echo $atts["cookie"] ?>, <?php echo $atts['as_percent']; ?>)
 
@@ -123,11 +118,7 @@ function sc_question($atts, $content = null){
     </div>
 
     <?php
-
-    $output = ob_get_contents();
-    ob_end_clean();
-    return $output;
-
+	return ob_get_clean();
 }
 add_shortcode("question", 'sc_question');
 
@@ -135,70 +126,65 @@ add_shortcode("question", 'sc_question');
 /*
 	WPBakery den Shortcode beibringen und Datenfelder Beschreiben für das Konfig-Feld
 */
-add_action('init', function(){
-	if( function_exists('vc_map') ){
-		add_action( 'vc_before_init', function(){
-	        vc_map( array(
-	            "name" => "Umfrage",
-	            "description" => "Ask-A-Question Umfrage",
-	            "base" => "question",
-	            "class" => "",
-	            "icon" => plugins_url("assets/vc-icon.svg", __FILE__), // Simply pass url to your icon here
-	            "category" => "Umfrage",
-	            "content_element" => true,
-	            // "is_container" => true,
-	            "params" => array(
-	                array(
-	                    "type" => "textfield",
-	                    "class" => "",
-	                    "heading" => "Frage",
-	                    "param_name" => 'question',
-	                    "value" => '',
-	                    "description" => "",
-	                    "admin_label" => true,
-	                ),
-	                array(
-	                    "type" => "textfield",
-	                    "class" => "",
-	                    "heading" => "Antworten",
-	                    "param_name" => 'answers',
-	                    "value" => '',
-	                    "description" => "Antwortmöglichkeiten mit Semikolon trennen",
-	                ),
-	                array(
-	                    "type" => "dropdown",
-	                    "class" => "",
-	                    "heading" => "Cookie",
-	                    "param_name" => 'cookie',
-	                    "value" => ["Ja" => 1, "Nein" => 0],
-						"std" => "1",
-	                    "description" => "Wenn aktiviert kann ein User nur 1 mal abstimmen.",
-	                ),
-	                array(
-	                    "type" => "dropdown",
-	                    "class" => "",
-	                    "heading" => "Ergebniss vor Abstimmung anzeigen?",
-	                    "param_name" => 'show_results',
-	                    "value" => ["Nein" => 0, "Ja" => 1],
-						"std" => "0",
-	                    "description" => "Wenn aktiviert kann ein User nur 1 mal abstimmen.",
-	                ),
-	                array(
-	                    "type" => "dropdown",
-	                    "class" => "",
-	                    "heading" => "Ergebniss in Prozent anzeigen?",
-	                    "param_name" => 'as_percent',
-	                    "value" => ["Nein" => 0, "Ja" => 1],
-						"std" => "0",
-	                    "description" => "Wenn aktiviert werden die Ergebnisse in Prozent angezeigt.",
-	                ),
+add_action( 'vc_before_init', function(){
+    vc_map( array(
+        "name" => "Umfrage",
+        "description" => "Ask-A-Question Umfrage",
+        "base" => "question",
+        "class" => "",
+        "icon" => plugins_url("assets/vc-icon.svg", __FILE__), // Simply pass url to your icon here
+        "category" => "Umfrage",
+        "content_element" => true,
+        // "is_container" => true,
+        "params" => array(
+            array(
+                "type" => "textfield",
+                "class" => "",
+                "heading" => "Frage",
+                "param_name" => 'question',
+                "value" => '',
+                "description" => "",
+                "admin_label" => true,
+            ),
+            array(
+                "type" => "textfield",
+                "class" => "",
+                "heading" => "Antworten",
+                "param_name" => 'answers',
+                "value" => '',
+                "description" => "Antwortmöglichkeiten mit Semikolon trennen",
+            ),
+            array(
+                "type" => "dropdown",
+                "class" => "",
+                "heading" => "Cookie",
+                "param_name" => 'cookie',
+                "value" => ["Ja" => 1, "Nein" => 0],
+				"std" => "1",
+                "description" => "Wenn aktiviert kann ein User nur 1 mal abstimmen.",
+            ),
+            array(
+                "type" => "dropdown",
+                "class" => "",
+                "heading" => "Ergebniss vor Abstimmung anzeigen?",
+                "param_name" => 'show_results',
+                "value" => ["Nein" => 0, "Ja" => 1],
+				"std" => "0",
+                "description" => "Wenn aktiviert kann ein User nur 1 mal abstimmen.",
+            ),
+            array(
+                "type" => "dropdown",
+                "class" => "",
+                "heading" => "Ergebniss in Prozent anzeigen?",
+                "param_name" => 'as_percent',
+                "value" => ["Nein" => 0, "Ja" => 1],
+				"std" => "0",
+                "description" => "Wenn aktiviert werden die Ergebnisse in Prozent angezeigt.",
+            ),
 
-	            )
-	        ) );
-	    } );
-	}
-});
-
+        )
+    ) );
+} );
 
 
 
@@ -257,14 +243,12 @@ function ajax_question_set_answer(){
 
 
 add_action( 'wp_ajax_question_reset', 'ajax_question_reset');
-// add_action( 'wp_ajax_nopriv_question_reset', 'ajax_question_reset');
 
 function ajax_question_reset(){
     $question = $_REQUEST["question"];
 
 	update_option($question, "" );
 
-	echo "1";
 	wp_die();
 }
 

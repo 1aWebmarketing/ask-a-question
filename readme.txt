@@ -21,6 +21,9 @@ Nutze den Shortcode [question] um eine neue Frage zu stellen. Die Frage wird im 
 
 == Changelog ==
 
+= 1.1.1 =
+* Plugin update checker zu V5 aktualisiert
+
 = 1.1.0 =
 * Prozentanzeige hinzugefügt
 
